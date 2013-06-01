@@ -6,16 +6,22 @@
 require.config
 	paths:
 		jquery: 'jquery'
+		ace: "/../components/ace/lib/ace"
 
-require ['jquery'], ($) ->
+require ['jquery', 'ace/editor'], ($) ->
 	$ ->
 		stream = shoe("http://localhost:3000/dnode")
-		result = document.getElementById('result');
 
 		d = dnode()
 		d.on "remote", (remote) ->
-			remote.transform "beep", (s) ->
-				result.textContent = "beep => " + s
-
+			remote.readdirSync "/home/slang", (files) ->
+				document.getElementById('result').textContent = files.join('\n')
+			remote.readFileSync "/home/slang/.bashrc", (files) ->
+				document.getElementById('editor').textContent = files
 
 		d.pipe(stream).pipe d
+
+		ace = require("ace/editor")
+		editor = ace.edit("editor")
+		editor.setTheme("ace/theme/monokai");
+		editor.getSession().setMode("ace/mode/javascript");

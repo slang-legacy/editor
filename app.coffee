@@ -34,12 +34,17 @@ exports.locals =
 http = require("http")
 shoe = require("shoe")
 dnode = require("dnode")
+fs = require('fs')
+
 server = http.createServer()
 server.listen 3000
 sock = shoe((stream) ->
-	d = dnode(transform: (s, cb) ->
-		res = s.replace(/[aeiou]{2,}/, "oo").toUpperCase()
-		cb res
+	d = dnode(
+		transform: (s, cb) ->
+			res = s.replace(/[aeiou]{2,}/, "oo").toUpperCase()
+			cb res
+		readFileSync: (file, cb) -> cb fs.readFileSync(file).toString()
+		readdirSync: (dir, cb) -> cb fs.readdirSync(dir)
 	)
 	d.pipe(stream).pipe d
 )

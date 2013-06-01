@@ -1,23 +1,30 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'jquery'
+      jquery: 'jquery',
+      ace: "/../components/ace/lib/ace"
     }
   });
 
-  require(['jquery'], function($) {
+  require(['jquery', 'ace/editor'], function($) {
     return $(function() {
-      var d, result, stream;
+      var ace, d, editor, stream;
 
       stream = shoe("http://localhost:3000/dnode");
-      result = document.getElementById('result');
       d = dnode();
       d.on("remote", function(remote) {
-        return remote.transform("beep", function(s) {
-          return result.textContent = "beep => " + s;
+        remote.readdirSync("/home/slang", function(files) {
+          return document.getElementById('result').textContent = files.join('\n');
+        });
+        return remote.readFileSync("/home/slang/.bashrc", function(files) {
+          return document.getElementById('editor').textContent = files;
         });
       });
-      return d.pipe(stream).pipe(d);
+      d.pipe(stream).pipe(d);
+      ace = require("ace/editor");
+      editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      return editor.getSession().setMode("ace/mode/javascript");
     });
   });
 
