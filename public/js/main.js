@@ -2,29 +2,23 @@
   require.config({
     paths: {
       jquery: 'jquery',
-      ace: "/../components/ace/lib/ace"
+      ace: '/components/ace/build/src/'
     }
   });
 
-  require(['jquery', 'ace/editor'], function($) {
+  require(['jquery', 'ace/mode-javascript', "ace/theme-monokai"], function($) {
     return $(function() {
-      var ace, d, editor, stream;
+      var EditSession, Editor, Renderer, ace_container, editor, mode_javascript, session, stream, temp;
 
       stream = shoe("http://localhost:3000/dnode");
-      d = dnode();
-      d.on("remote", function(remote) {
-        remote.readdirSync("/home/slang", function(files) {
-          return document.getElementById('result').textContent = files.join('\n');
-        });
-        return remote.readFileSync("/home/slang/.bashrc", function(files) {
-          return document.getElementById('editor').textContent = files;
-        });
-      });
-      d.pipe(stream).pipe(d);
-      ace = require("ace/editor");
-      editor = ace.edit("editor");
-      editor.setTheme("ace/theme/monokai");
-      return editor.getSession().setMode("ace/mode/javascript");
+      temp = "	$ ->\nstream = shoe(\"http://localhost:3000/dnode\")\n\nd = dnode()\nd.on \"remote\", (remote) ->\n	remote.readdirSync \"/home/slang\", (files) ->\n		document.getElementById('result').textContent = files.join('\n')\n	remote.readFileSync \"/home/slang/.bashrc\", (files) ->\n		document.getElementById('editor').textContent = files\n\nd.pipe(stream).pipe d";
+      EditSession = require('ace/edit_session').EditSession;
+      Editor = require("ace/editor").Editor;
+      Renderer = require("ace/virtual_renderer").VirtualRenderer;
+      mode_javascript = require('ace/mode-javascript');
+      session = new EditSession(temp, mode_javascript);
+      ace_container = new Renderer(document.getElementById('editor'), require("ace/theme-monokai"));
+      return editor = new Editor(ace_container, session);
     });
   });
 

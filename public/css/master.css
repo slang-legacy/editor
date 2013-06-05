@@ -185,6 +185,8 @@ body {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
-body {
-  padding: 50px;
+@import '/components/ace/lib/ace/css/editor.css';
+#editor {
+  width: 500px;
+  height: 500px;
 }

@@ -4,20 +4,17 @@
 *.tmp
 
 # Project files that should not be in the repo
-.project
-.settings/
-.settings.xml
-.c9settings.xml
-.settings.xml.old
+.*
+!/.gitignore
 .*.gz
+*.tmTheme.js
 
 # A handy place to put stuff that git should ignore:
 /ignore/
-support/async/
-support/jsdom/
-support/node-htmlparser/
-support/node-o3-xml/
-support/requirejs/
+node_modules/
+jam/
+* *
 
-/node_modules
-support/node-o3-xml-v4/
+.git-ref
+npm-debug.log
+deps/
