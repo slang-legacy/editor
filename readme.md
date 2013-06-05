@@ -1,10 +1,13 @@
-Your Project Name
+Editor
 =================
-A brief summary of your project
+New and improved web editor!
+
+
+### Knowledge
+Gotta have some, right?
 
 ### Setup / Installation
-Some instructions on how to set up and/or install this project
+**Get some!** (roots!)[http://roots.cx]
 
 ### Staging/Production
-This site is staged at http://example.com [u: admin p: example]    
-This site is live at http://example.com
+Watch it with roots!
