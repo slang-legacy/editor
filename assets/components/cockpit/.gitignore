@@ -1,0 +1,23 @@
+
+# Junk that could exist anywhere:
+.DS_Store
+*.swp
+*.tmp
+.*.gz
+
+# A handy place to put stuff that git should ignore:
+/ignore/
+/experiment/
+
+# Editor junk
+/.project
+/.settings/
+/.settings.xml
+/.settings.xml.old
+
+# Build artifacts
+/build/gcli-uncompressed.js
+/build/gcli.js
+/build/ff_require.js
+/build/gcli-ff.js
+
