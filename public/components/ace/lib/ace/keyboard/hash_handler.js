@@ -1,115 +1,170 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ * Distributed under the BSD license:
  *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is Mozilla Skywriter.
- *
- * The Initial Developer of the Original Code is
- * Mozilla.
- * Portions created by the Initial Developer are Copyright (C) 2009
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *   Fabian Jakobs <fabian AT ajax DOT org>
- *   Julian Viereck (julian.viereck@gmail.com)
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
+ * Copyright (c) 2010, Ajax.org B.V.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of Ajax.org B.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL AJAX.ORG B.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ***** END LICENSE BLOCK ***** */
 
 define(function(require, exports, module) {
+"use strict";
 
-var keyUtil  = require("pilot/keys");
+var keyUtil = require("../lib/keys");
+var useragent = require("../lib/useragent");
 
-function HashHandler(config) {
-    this.setConfig(config);
-}
+function HashHandler(config, platform) {
+    this.platform = platform || (useragent.isMac ? "mac" : "win");
+    this.commands = {};
+    this.commmandKeyBinding = {};
+
+    this.addCommands(config);
+};
 
 (function() {
-    function splitSafe(s, separator, limit, bLowerCase) {
-        return (bLowerCase && s.toLowerCase() || s)
-            .replace(/(?:^\s+|\n|\s+$)/g, "")
-            .split(new RegExp("[\\s ]*" + separator + "[\\s ]*", "g"), limit || 999);
-    }
 
-    function parseKeys(keys, val, ret) {
-        var key,
-            hashId = 0,
-            parts  = splitSafe(keys, "\\-", null, true),
-            i      = 0,
-            l      = parts.length;
+    this.addCommand = function(command) {
+        if (this.commands[command.name])
+            this.removeCommand(command);
 
-        for (; i < l; ++i) {
-            if (keyUtil.KEY_MODS[parts[i]])
-                hashId = hashId | keyUtil.KEY_MODS[parts[i]];
-            else
-                key = parts[i] || "-"; //when empty, the splitSafe removed a '-'
-        }
+        this.commands[command.name] = command;
 
-        (ret[hashId] || (ret[hashId] = {}))[key] = val;
-        return ret;
-    }
-
-    function objectReverse(obj, keySplit) {
-        var i, j, l, key,
-            ret = {};
-        for (i in obj) {
-            key = obj[i];
-            if (keySplit && typeof key == "string") {
-                key = key.split(keySplit);
-                for (j = 0, l = key.length; j < l; ++j)
-                    parseKeys.call(this, key[j], i, ret);
-            }
-            else {
-                parseKeys.call(this, key, i, ret);
-            }
-        }
-        return ret;
-    }
-
-    this.setConfig = function(config) {
-        this.$config = config;
-        if (typeof this.$config.reverse == "undefined")
-            this.$config.reverse = objectReverse.call(this, this.$config, "|");
+        if (command.bindKey)
+            this._buildKeyHash(command);
     };
 
-    /**
-     * This function is called by keyBinding.
-     */
-    this.handleKeyboard = function(data, hashId, textOrKey, keyCode) {
-        // Figure out if a commandKey was pressed or just some text was insert.
-        if (hashId != 0 || keyCode != 0) {
-            return {
-                command: (this.$config.reverse[hashId] || {})[textOrKey]
-            }
-        } else {
-            return {
-                command: "inserttext",
-                args: {
-                    text: textOrKey
-                }
+    this.removeCommand = function(command) {
+        var name = (typeof command === 'string' ? command : command.name);
+        command = this.commands[name];
+        delete this.commands[name];
+
+        // exhaustive search is brute force but since removeCommand is
+        // not a performance critical operation this should be OK
+        var ckb = this.commmandKeyBinding;
+        for (var hashId in ckb) {
+            for (var key in ckb[hashId]) {
+                if (ckb[hashId][key] == command)
+                    delete ckb[hashId][key];
             }
         }
-    }
+    };
+
+    this.bindKey = function(key, command) {
+        if(!key)
+            return;
+        if (typeof command == "function") {
+            this.addCommand({exec: command, bindKey: key, name: command.name || key});
+            return;
+        }
+
+        var ckb = this.commmandKeyBinding;
+        key.split("|").forEach(function(keyPart) {
+            var binding = this.parseKeys(keyPart, command);
+            var hashId = binding.hashId;
+            (ckb[hashId] || (ckb[hashId] = {}))[binding.key] = command;
+        }, this);
+    };
+
+    this.addCommands = function(commands) {
+        commands && Object.keys(commands).forEach(function(name) {
+            var command = commands[name];
+            if (typeof command === "string")
+                return this.bindKey(command, name);
+
+            if (typeof command === "function")
+                command = { exec: command };
+
+            if (!command.name)
+                command.name = name;
+
+            this.addCommand(command);
+        }, this);
+    };
+
+    this.removeCommands = function(commands) {
+        Object.keys(commands).forEach(function(name) {
+            this.removeCommand(commands[name]);
+        }, this);
+    };
+
+    this.bindKeys = function(keyList) {
+        Object.keys(keyList).forEach(function(key) {
+            this.bindKey(key, keyList[key]);
+        }, this);
+    };
+
+    this._buildKeyHash = function(command) {
+        var binding = command.bindKey;
+        if (!binding)
+            return;
+
+        var key = typeof binding == "string" ? binding: binding[this.platform];
+        this.bindKey(key, command);
+    };
+
+    // accepts keys in the form ctrl+Enter or ctrl-Enter
+    // keys without modifiers or shift only 
+    this.parseKeys = function(keys) {
+        // todo support keychains 
+        if (keys.indexOf(" ") != -1)
+            keys = keys.split(/\s+/).pop();
+
+        var parts = keys.toLowerCase().split(/[\-\+]([\-\+])?/).filter(function(x){return x});
+        var key = parts.pop();
+
+        var keyCode = keyUtil[key];
+        if (keyUtil.FUNCTION_KEYS[keyCode])
+            key = keyUtil.FUNCTION_KEYS[keyCode].toLowerCase();
+        else if (!parts.length)
+            return {key: key, hashId: -1};
+        else if (parts.length == 1 && parts[0] == "shift")
+            return {key: key.toUpperCase(), hashId: -1};
+
+        var hashId = 0;
+        for (var i = parts.length; i--;) {
+            var modifier = keyUtil.KEY_MODS[parts[i]];
+            if (modifier == null) {
+                if (typeof console != "undefined")
+                console.error("invalid modifier " + parts[i] + " in " + keys);
+                return false;
+            }
+            hashId |= modifier;
+        }
+        return {key: key, hashId: hashId};
+    };
+
+    this.findKeyCommand = function findKeyCommand(hashId, keyString) {
+        var ckbr = this.commmandKeyBinding;
+        return ckbr[hashId] && ckbr[hashId][keyString];
+    };
+
+    this.handleKeyboard = function(data, hashId, keyString, keyCode) {
+        return {
+            command: this.findKeyCommand(hashId, keyString)
+        };
+    };
+
 }).call(HashHandler.prototype)
 
 exports.HashHandler = HashHandler;

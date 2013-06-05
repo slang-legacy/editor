@@ -1,18 +1,18 @@
-
 define(function(require, exports, module) {
-    
-var Document = require("ace/document").Document;
-var lang = require("pilot/lang");
+"use strict";
+
+var Document = require("../document").Document;
+var lang = require("../lib/lang");
     
 var Mirror = exports.Mirror = function(sender) {
     this.sender = sender;
     var doc = this.doc = new Document("");
     
-    var deferredUpdate = this.deferredUpdate = lang.deferredCall(this.onUpdate.bind(this));
+    var deferredUpdate = this.deferredUpdate = lang.delayedCall(this.onUpdate.bind(this));
     
     var _self = this;
     sender.on("change", function(e) {
-        doc.applyDeltas([e.data]);        
+        doc.applyDeltas(e.data);
         deferredUpdate.schedule(_self.$timeout);
     });
 };

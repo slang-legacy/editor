@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-    
+
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -25,7 +25,7 @@ define(function(require, exports, module) {
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // UTILITY
-var oop = require('pilot/oop');
+var oop = require("ace/lib/oop");
 var pSlice = Array.prototype.slice;
 
 // 1. The assert module provides functions that throw
@@ -53,14 +53,21 @@ assert.AssertionError = function AssertionError(options) {
 };
 oop.inherits(assert.AssertionError, Error);
 
+toJSON = function(obj) {
+    if (typeof JSON !== "undefined")
+        return JSON.stringify(obj);
+    else
+        return obj.toString();
+}
+
 assert.AssertionError.prototype.toString = function() {
   if (this.message) {
     return [this.name + ':', this.message].join(' ');
   } else {
     return [this.name + ':',
-            JSON.stringify(this.expected),
+            toJSON(this.expected),
             this.operator,
-            JSON.stringify(this.actual)].join(' ');
+            toJSON(this.actual)].join(' ');
   }
 };
 
@@ -134,7 +141,7 @@ function _deepEqual(actual, expected) {
   if (actual === expected) {
     return true;
 
-  } else if (Buffer.isBuffer(actual) && Buffer.isBuffer(expected)) {
+  } else if (typeof Buffer !== "undefined" && Buffer.isBuffer(actual) && Buffer.isBuffer(expected)) {
     if (actual.length != expected.length) return false;
 
     for (var i = 0; i < actual.length; i++) {
