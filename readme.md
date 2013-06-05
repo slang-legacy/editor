@@ -7,7 +7,7 @@ New and improved web editor!
 Gotta have some, right?
 
 ### Setup / Installation
-**Get some!** (roots!)[http://roots.cx]
+**Get some!** [roots!](http://roots.cx)
 
 ### Staging/Production
 Watch it with roots!
