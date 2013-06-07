@@ -1,11 +1,11 @@
 require.config
 	paths:
-		jquery: 'jquery'
+		jquery: '/components/jquery/jquery.min'
 		ace: '/components/ace/lib/ace'
 
 require [
 	'jquery'
-	'ace/editor'
+	'extend_ace/editor'
 	'ace/edit_session'
 	"ace/undomanager"
 	'ace/virtual_renderer'
@@ -21,7 +21,7 @@ require [
 			d = dnode()
 			d.on "remote", (remote) ->
 				remote.readdirSync "/home/slang", (files) ->
-					document.getElementById('result').textContent = files.join('\n')
+					document.getElementById('result').textContent = files.join('\\n')
 				remote.readFileSync "/home/slang/.bashrc", (files) ->
 					document.getElementById('editor').textContent = files
 
@@ -39,7 +39,7 @@ require [
 		#d.pipe(stream).pipe d
 
 		EditSession = require('ace/edit_session').EditSession
-		Editor = require("ace/editor").Editor
+		Editor = require("extend_ace/editor")
 		MultiSelect = require("ace/multi_select").MultiSelect
 		UndoManager = require("ace/undomanager").UndoManager
 		Renderer = require("ace/virtual_renderer").VirtualRenderer
