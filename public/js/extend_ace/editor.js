@@ -4,7 +4,6 @@
 
   define(["ace/lib/fixoldbrowsers", "ace/lib/oop", "ace/lib/dom", "ace/lib/lang", "ace/lib/useragent", "ace/keyboard/textinput", "ace/mouse/mouse_handler", "ace/mouse/fold_handler", "ace/keyboard/keybinding", "ace/edit_session", "ace/search", "ace/range", "extend_ace/lib/event_emitter", "ace/commands/command_manager", "ace/commands/default_commands", "ace/config"], function() {
     var CommandManager, EditSession, Editor, EventEmitter, FoldHandler, KeyBinding, MouseHandler, Range, Search, TextInput, config, defaultCommands, dom, lang, oop, useragent;
-
     require("ace/lib/fixoldbrowsers");
     oop = require("ace/lib/oop");
     dom = require("ace/lib/dom");
@@ -46,7 +45,6 @@
 
       function Editor(renderer, session) {
         var container;
-
         container = renderer.getContainerElement();
         this.container = container;
         this.renderer = renderer;
@@ -73,7 +71,6 @@
 
       Editor.prototype.setKeyboardHandler = function(keyboardHandler) {
         var _self;
-
         if (!keyboardHandler) {
           return this.keyBinding.setKeyboardHandler(null);
         } else if (typeof keyboardHandler === "string") {
@@ -116,7 +113,6 @@
 
       Editor.prototype.setSession = function(session) {
         var oldSession, selection;
-
         if (this.session === session) {
           return;
         }
@@ -328,7 +324,6 @@
 
       Editor.prototype.$highlightBrackets = function() {
         var self;
-
         if (this.session.$bracketHighlight) {
           this.session.removeMarker(this.session.$bracketHighlight);
           this.session.$bracketHighlight = null;
@@ -340,7 +335,6 @@
         this.$highlightPending = true;
         return setTimeout((function() {
           var pos, range;
-
           self.$highlightPending = false;
           pos = self.session.findMatchingBracket(self.getCursorPosition());
           if (pos) {
@@ -363,7 +357,6 @@
 
       Editor.prototype.focus = function() {
         var _self;
-
         _self = this;
         setTimeout(function() {
           return _self.textInput.focus();
@@ -435,7 +428,6 @@
 
       Editor.prototype.onDocumentChange = function(e) {
         var delta, lastRow, range;
-
         delta = e.data;
         range = delta.range;
         lastRow = void 0;
@@ -451,7 +443,6 @@
 
       Editor.prototype.onTokenizerUpdate = function(e) {
         var rows;
-
         rows = e.data;
         return this.renderer.updateLines(rows.first, rows.last);
       };
@@ -481,7 +472,6 @@
 
       Editor.prototype.$updateHighlightActiveLine = function() {
         var highlight, range, session;
-
         session = this.getSession();
         highlight = void 0;
         if (this.$highlightActiveLine ? this.$selectionStyle !== "line" || !this.selection.isMultiLine() : void 0) {
@@ -504,7 +494,6 @@
 
       Editor.prototype.onSelectionChange = function(e) {
         var range, re, session, style;
-
         session = this.session;
         if (session.$selectionMarker) {
           session.removeMarker(session.$selectionMarker);
@@ -524,7 +513,6 @@
 
       Editor.prototype.$getSelectionHighLightRegexp = function() {
         var endOuter, line, lineCols, needle, re, selection, session, startOuter;
-
         session = this.session;
         selection = this.getSelectionRange();
         if (selection.isEmpty() || selection.isMultiLine()) {
@@ -599,7 +587,6 @@
 
       Editor.prototype.getCopyText = function() {
         var text;
-
         text = "";
         if (!this.selection.isEmpty()) {
           text = this.session.getTextRange(this.getSelectionRange());
@@ -659,7 +646,6 @@
 
       Editor.prototype.insert = function(text) {
         var cursor, end, i, indent, line, lineIndent, lineState, minIndent, mode, outdent, range, row, session, shouldOutdent, size, start, transform;
-
         session = this.session;
         mode = session.getMode();
         cursor = this.getCursorPosition();
@@ -1071,7 +1057,6 @@
 
       Editor.prototype.remove = function(dir) {
         var new_range, range, session, state;
-
         if (this.selection.isEmpty()) {
           if (dir === "left") {
             this.selection.selectLeft();
@@ -1138,7 +1123,6 @@
 
       Editor.prototype.removeToLineEnd = function() {
         var range;
-
         if (this.selection.isEmpty()) {
           this.selection.selectLineEnd();
         }
@@ -1158,7 +1142,6 @@
 
       Editor.prototype.splitLine = function() {
         var cursor;
-
         if (!this.selection.isEmpty()) {
           this.session.remove(this.getSelectionRange());
           this.clearSelection();
@@ -1175,7 +1158,6 @@
 
       Editor.prototype.transposeLetters = function() {
         var column, cursor, line, range, swap;
-
         if (!this.selection.isEmpty()) {
           return;
         }
@@ -1204,7 +1186,6 @@
 
       Editor.prototype.toLowerCase = function() {
         var originalRange, range, text;
-
         originalRange = this.getSelectionRange();
         if (this.selection.isEmpty()) {
           this.selection.selectWord();
@@ -1222,7 +1203,6 @@
 
       Editor.prototype.toUpperCase = function() {
         var originalRange, range, text;
-
         originalRange = this.getSelectionRange();
         if (this.selection.isEmpty()) {
           this.selection.selectWord();
@@ -1242,7 +1222,6 @@
 
       Editor.prototype.indent = function() {
         var column, count, indentString, position, range, rows, session, size;
-
         session = this.session;
         range = this.getSelectionRange();
         if (range.start.row < range.end.row || range.start.column < range.end.column) {
@@ -1271,7 +1250,6 @@
 
       Editor.prototype.blockIndent = function() {
         var rows;
-
         rows = this.$getSelectedRows();
         return this.session.indentRows(rows.first, rows.last, "\t");
       };
@@ -1284,14 +1262,12 @@
 
       Editor.prototype.blockOutdent = function() {
         var selection;
-
         selection = this.session.getSelection();
         return this.session.outdentRows(selection.getRange());
       };
 
       Editor.prototype.sortLines = function() {
         var deleteRange, i, line, lines, rows, session, _results;
-
         rows = this.$getSelectedRows();
         session = this.session;
         lines = [];
@@ -1330,7 +1306,6 @@
 
       Editor.prototype.toggleCommentLines = function() {
         var rows, state;
-
         state = this.session.getState(this.getCursorPosition().row);
         rows = this.$getSelectedRows();
         return this.session.getMode().toggleCommentLines(state, this.session, rows.first, rows.last);
@@ -1338,7 +1313,6 @@
 
       Editor.prototype.toggleBlockComment = function() {
         var cursor, range, state;
-
         cursor = this.getCursorPosition();
         state = this.session.getState(cursor.row);
         range = this.getSelectionRange();
@@ -1353,7 +1327,6 @@
 
       Editor.prototype.getNumberAt = function(row, column) {
         var m, number, s, _numberRx;
-
         _numberRx = /[\-]?[0-9]+(?:\.[0-9]+)?/g;
         _numberRx.lastIndex = 0;
         s = this.session.getLine(row);
@@ -1379,7 +1352,6 @@
 
       Editor.prototype.modifyNumber = function(amount) {
         var c, charRange, column, decimals, fp, nnr, nr, replaceRange, row, t;
-
         row = this.selection.getCursor().row;
         column = this.selection.getCursor().column;
         charRange = new Range(row, column - 1, row, column);
@@ -1408,7 +1380,6 @@
 
       Editor.prototype.removeLines = function() {
         var range, rows;
-
         rows = this.$getSelectedRows();
         range = void 0;
         if (rows.first === 0 || rows.last + 1 < this.session.getLength()) {
@@ -1428,7 +1399,6 @@
 
       Editor.prototype.duplicateSelection = function() {
         var doc, endPoint, point, range, reverse, row, sel;
-
         sel = this.selection;
         doc = this.session;
         range = sel.getRange();
@@ -1523,7 +1493,6 @@
 
       Editor.prototype.$moveLines = function(mover) {
         var first, i, last, linesMoved, range, rangeIndex, ranges, rows, selection;
-
         selection = this.selection;
         if (!selection.inMultiSelectMode || this.inVirtualSelectionMode) {
           range = selection.toOrientedRange();
@@ -1573,7 +1542,6 @@
 
       Editor.prototype.$getSelectedRows = function() {
         var range;
-
         range = this.getSelectionRange().collapseRows();
         return {
           first: range.start.row,
@@ -1654,7 +1622,6 @@
 
       Editor.prototype.$moveByPage = function(dir, select) {
         var renderer, rows, scrollTop;
-
         renderer = this.renderer;
         config = this.renderer.layerConfig;
         rows = dir * Math.floor(config.height / config.lineHeight);
@@ -1763,7 +1730,6 @@
 
       Editor.prototype.centerSelection = function() {
         var pos, range;
-
         range = this.getSelectionRange();
         pos = {
           row: Math.floor(range.start.row + (range.end.row - range.start.row) / 2),
@@ -1865,7 +1831,6 @@
 
       Editor.prototype.jumpToMatching = function(select) {
         var cursor, pos, range;
-
         cursor = this.getCursorPosition();
         range = this.session.getBracketRange(cursor);
         if (!range) {
@@ -1946,7 +1911,6 @@
 
       Editor.prototype.navigateUp = function(times) {
         var selectionStart;
-
         if (this.selection.isMultiLine() && !this.selection.isBackwards()) {
           selectionStart = this.selection.anchor.getPosition();
           return this.moveCursorToPosition(selectionStart);
@@ -1964,7 +1928,6 @@
 
       Editor.prototype.navigateDown = function(times) {
         var selectionEnd;
-
         if (this.selection.isMultiLine() && this.selection.isBackwards()) {
           selectionEnd = this.selection.anchor.getPosition();
           return this.moveCursorToPosition(selectionEnd);
@@ -1982,7 +1945,6 @@
 
       Editor.prototype.navigateLeft = function(times) {
         var selectionStart;
-
         if (!this.selection.isEmpty()) {
           selectionStart = this.getSelectionRange().start;
           this.moveCursorToPosition(selectionStart);
@@ -2003,7 +1965,6 @@
 
       Editor.prototype.navigateRight = function(times) {
         var selectionEnd;
-
         if (!this.selection.isEmpty()) {
           selectionEnd = this.getSelectionRange().end;
           this.moveCursorToPosition(selectionEnd);
@@ -2043,7 +2004,6 @@
 
       Editor.prototype.navigateFileEnd = function() {
         var scrollTop;
-
         scrollTop = this.renderer.scrollTop;
         this.selection.moveCursorFileEnd();
         this.clearSelection();
@@ -2057,7 +2017,6 @@
 
       Editor.prototype.navigateFileStart = function() {
         var scrollTop;
-
         scrollTop = this.renderer.scrollTop;
         this.selection.moveCursorFileStart();
         this.clearSelection();
@@ -2093,7 +2052,6 @@
 
       Editor.prototype.replace = function(replacement, options) {
         var range, replaced;
-
         if (options) {
           this.$search.set(options);
         }
@@ -2121,7 +2079,6 @@
 
       Editor.prototype.replaceAll = function(replacement, options) {
         var i, ranges, replaced, selection;
-
         if (options) {
           this.$search.set(options);
         }
@@ -2148,7 +2105,6 @@
 
       Editor.prototype.$tryReplace = function(range, replacement) {
         var input;
-
         input = this.session.getTextRange(range);
         replacement = this.$search.replace(input, replacement);
         if (replacement !== null) {
@@ -2183,7 +2139,6 @@
 
       Editor.prototype.find = function(needle, options, animate) {
         var newRange, range;
-
         if (!options) {
           options = {};
         }
@@ -2263,7 +2218,6 @@
 
       Editor.prototype.revealRange = function(range, animate) {
         var scrollTop;
-
         this.$blockScrolling += 1;
         this.session.unfold(range);
         this.selection.setSelectionRange(range);
@@ -2319,7 +2273,6 @@
 
       Editor.prototype.setAutoScrollEditorIntoView = function(enable) {
         var onAfterRender, onBeforeRender, onChangeSelection, rect, scrollAnchor, self, shouldScroll;
-
         if (enable === false) {
           return;
         }
@@ -2342,7 +2295,6 @@
         });
         onAfterRender = this.renderer.on("afterRender", function() {
           var pos, renderer, top;
-
           if (shouldScroll && rect && self.isFocused()) {
             renderer = self.renderer;
             pos = renderer.$cursorLayer.$pixelPos;
@@ -2379,7 +2331,6 @@
 
       Editor.prototype.$resetCursorStyle = function() {
         var cursorLayer, style;
-
         style = this.$cursorStyle || "ace";
         cursorLayer = this.renderer.$cursorLayer;
         if (!cursorLayer) {

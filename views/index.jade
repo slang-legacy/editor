@@ -1,6 +1,15 @@
-#editor_container
+#main_container
 	#editor
 #info_bar
-	span#output example text
+	span#output Line 4, Column 31
 	span#indentation Tab Size: 4
 	span#language CoffeeScript
+	.btn-group.dropup
+		button.btn Dropup
+		button.btn.dropdown-toggle(data-toggle="dropdown")
+			span.caret
+		ul.dropdown-menu
+			li
+				a(tabindex="-1", href="#") Regular link
+			li dropdown menu links
+			li dropdown menu links

@@ -4,8 +4,10 @@
 
 # Files in this list will not be compiled - minimatch supported
 
-exports.ignore_files = ['_*', 'readme*', '.gitignore', '.DS_Store']
-exports.ignore_folders = ['.git', 'node_modules']
+exports.ignore_files = ['_*', 'readme*', '.git*', '.DS_Store', 'package.json', 'readme*']
+exports.ignore_folders = ['.git', 'node_modules', 'bootstrap-stylus', 'demo', 'test', 'tests', 'api']
+
+exports.compress = false
 
 # Layout file config
 # `default` applies to all views. Overrides for specific

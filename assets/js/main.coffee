@@ -2,6 +2,7 @@ require.config
 	paths:
 		jquery: '/components/jquery/jquery.min'
 		ace: '/components/ace/lib/ace'
+		#bootstrap: '/components/bootstrap-stylus/js'
 
 require [
 	'jquery'
@@ -12,6 +13,7 @@ require [
 	"ace/multi_select"
 	'ace/mode/coffee'
 	"ace/theme/monokai"
+	#'bootstrap/bootstrap-dropdown'
 ], ($) ->
 	$ ->
 		temp = """

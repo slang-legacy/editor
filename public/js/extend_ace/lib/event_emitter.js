@@ -1,7 +1,6 @@
 (function() {
   define([], function() {
     var EventEmitter, preventDefault, stopPropagation;
-
     stopPropagation = function() {
       return this.propagationStopped = true;
     };
@@ -17,7 +16,6 @@
 
       EventEmitter.prototype._emit = function(eventName, e) {
         var defaultHandler, i, listeners;
-
         this._eventRegistry || (this._eventRegistry = {});
         this._defaultHandlers || (this._defaultHandlers = {});
         listeners = this._eventRegistry[eventName] || [];
@@ -52,7 +50,6 @@
 
       EventEmitter.prototype._signal = function(eventName, e) {
         var i, listeners, _results;
-
         listeners = (this._eventRegistry || {})[eventName];
         if (!listeners) {
           return;
@@ -68,7 +65,6 @@
 
       EventEmitter.prototype.once = function(eventName, callback) {
         var newCallback, _self;
-
         _self = this;
         return callback && this.addEventListener(eventName, newCallback = function() {
           _self.removeEventListener(eventName, newCallback);
@@ -78,7 +74,6 @@
 
       EventEmitter.prototype.setDefaultHandler = function(eventName, callback) {
         var disabled, handlers, i, old;
-
         handlers = this._defaultHandlers;
         if (!handlers) {
           handlers = this._defaultHandlers = {
@@ -102,7 +97,6 @@
 
       EventEmitter.prototype.removeDefaultHandler = function(eventName, callback) {
         var disabled, handlers, i, old;
-
         handlers = this._defaultHandlers;
         if (!handlers) {
           return;
@@ -123,7 +117,6 @@
 
       EventEmitter.prototype.on = function(eventName, callback, capturing) {
         var listeners;
-
         this._eventRegistry = this._eventRegistry || {};
         listeners = this._eventRegistry[eventName];
         if (!listeners) {
@@ -137,7 +130,6 @@
 
       EventEmitter.prototype.off = function(eventName, callback) {
         var index, listeners;
-
         this._eventRegistry = this._eventRegistry || {};
         listeners = this._eventRegistry[eventName];
         if (!listeners) {
