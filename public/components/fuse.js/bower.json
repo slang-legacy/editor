@@ -1,0 +1,9 @@
+{
+  "name": "fuse.js",
+  "version": "0.0.0",
+  "commit": "d0fdd50874966090def69e9a6642faa4ae4aa33a",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/krisk/Fuse.git"
+  }
+}
